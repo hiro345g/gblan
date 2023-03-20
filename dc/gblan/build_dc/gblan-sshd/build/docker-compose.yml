@@ -1,0 +1,25 @@
+name: gblan
+services:
+  gblan-sshd-build:
+    build:
+      context: .
+      args:
+        USER_ID: ${USER_UID:-1000}
+        USER_NAME: ${USER_NAME:-gblan}
+        USER_PASS: ${USER_PASS:-QheCZq1pPVThs}
+        GROUP_ID: ${USER_GID:-1000}
+        GROUP_NAME: ${GROUP_NAME:-gblan}
+    image: gblan-sshd:1.0
+    container_name: gblan-sshd-build
+    hostname: gblan-sshd-build
+    tty: true
+    volumes:
+      - sshd-etc-ssh-data:/etc/ssh
+      - sshd-home-data:/home
+    network_mode: "none"
+
+volumes:
+  sshd-etc-ssh-data:
+    name: gblan-sshd-etc-ssh-data
+  sshd-home-data:
+    name: gblan-sshd-home-data

@@ -1,0 +1,25 @@
+name: gblan
+services:
+  gblan-nginx-build:
+    image: nginx:1.23.1-alpine
+    container_name: gblan-nginx-build
+    hostname: gblan-nginx-build
+    tty: true
+    volumes:
+      - nginx-keys-data:/etc/nginx/keys
+      - nginx-html-data:/usr/share/nginx/html
+      - nginx-templates-data:/etc/nginx/templates
+      - share-data:/share
+    network_mode: none
+    environment:
+      - NGINX_PORT=443
+
+volumes:
+  nginx-keys-data:
+    name: gblan-nginx-keys-data
+  nginx-html-data:
+    name: gblan-nginx-html-data
+  nginx-templates-data:
+    name: gblan-nginx-templates-data
+  share-data:
+    name: gblan-share-data

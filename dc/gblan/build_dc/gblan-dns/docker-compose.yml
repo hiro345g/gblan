@@ -1,0 +1,19 @@
+name: gblan
+services:
+  gblan-dns:
+    image: gblan-dns:1.0
+    container_name: gblan-dns
+    hostname: gblan-dns
+    command: -conf /Corefile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      gblan-net:
+        ipv4_address: "192.168.51.100"
+    ports:
+      - "192.168.51.1:53:53/udp"
+
+networks:
+  gblan-net:
+    name: gblan-net
+    external: true

@@ -1,0 +1,87 @@
+name: gblan
+services:
+  gblan-dns:
+    image: gblan-dns:1.0
+    container_name: gblan-dns
+    hostname: gblan-dns
+    command: -conf /Corefile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      gblan-net:
+        ipv4_address: "192.168.51.100"
+    ports:
+      - "192.168.51.1:53:53/udp"
+
+  # http://localhost:8080/gitbucket/
+  gblan-gitbucket:
+    image: gitbucket/gitbucket:4.38.4
+    container_name: gblan-gitbucket
+    hostname: gblan-gitbucket
+    tty: true
+    volumes:
+      - gitbucket-data:/gitbucket
+      - share-data:/share
+    dns: "192.168.51.100"
+    ports:
+      - 8080:8080
+      - 2222:29418
+    networks:
+      gblan-net:
+        ipv4_address: "192.168.51.11"
+    depends_on:
+      - gblan-postgres
+    environment:
+      GITBUCKET_PREFIX: ${GITBUCKET_PREFIX:-/gitbucket}
+      GITBUCKET_DB_URL: ${GITBUCKET_DB_URL:-jdbc:postgresql://gblan-postgres/gitbucket}
+      GITBUCKET_DB_USER: ${POSTGRES_USER:-gitbucket001}
+      GITBUCKET_DB_PASSWORD: ${POSTGRES_PASSWORD:-jPZIrD1VX6HJk}
+
+  gblan-postgres:
+    image: postgres:14.5
+    container_name: gblan-postgres
+    hostname: gblan-postgres
+    tty: true
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      gblan-net:
+        ipv4_address: "192.168.51.12"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gitbucket}
+      POSTGRES_USER: ${POSTGRES_USER:-gitbucket001}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jPZIrD1VX6HJk}
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS:- --encoding=UTF-8 --no-locale}
+
+  # http://localhost:9080/
+  gblan-adminer:
+    image: adminer:4.8.1-standalone
+    #image: adminer:4.8.1-fastcgi
+    container_name: gblan-adminer
+    hostname: gblan-adminer
+    tty: true
+    dns: "192.168.51.100"
+    ports:
+      # standalone
+      - 9080:8080
+      # fastcgi
+      #- 9000:9000
+    networks:
+      gblan-net:
+        ipv4_address: "192.168.51.13"
+    environment:
+      ADMINER_DEFAULT_SERVER: ${ADMINER_DEFAULT_SERVER:-gblan-postgres}
+
+volumes:
+  postgres-data:
+    name: gblan-postgres-data
+  gitbucket-data:
+    name: gblan-gitbucket-data
+  share-data:
+    name: gblan-share-data
+    external: true
+
+networks:
+  gblan-net:
+    name: gblan-net
+    external: true

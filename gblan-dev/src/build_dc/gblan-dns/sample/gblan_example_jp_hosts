@@ -1,0 +1,6 @@
+192.168.51.100 gblan-dns.gblan.example.jp
+192.168.51.11 gblan-gitbucket.gblan.example.jp
+192.168.51.12 gblan-postgres.gblan.example.jp
+192.168.51.13 gblan-adminer.gblan.example.jp
+192.168.51.22 gblan-sshd.gblan.example.jp
+192.168.51.80 dev.gblan.example.jp www.gblan.example.jp gblan-nginx.gblan.example.jp

@@ -1,0 +1,13 @@
+name: gblan
+services:
+  gblan-gitbucket-build:
+    image: gitbucket/gitbucket:4.38.4
+    container_name: gblan-gitbucket-build
+    hostname: gblan-gitbucket-build
+    tty: true
+    volumes:
+      - gitbucket-data:/gitbucket
+
+volumes:
+  gitbucket-data:
+    name: gblan-gitbucket-data

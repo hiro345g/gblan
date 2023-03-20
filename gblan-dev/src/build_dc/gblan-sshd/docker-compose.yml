@@ -1,0 +1,44 @@
+name: gblan-dev
+services:
+  gblan-dev-dns:
+    image: gblan-dev-dns:1.0
+    container_name: gblan-dev-dns
+    hostname: gblan-dev-dns
+    command: -conf /Corefile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "192.168.51.1:53:53/udp"
+    networks:
+      gblan-dev-net:
+        ipv4_address: "192.168.51.100"
+
+  gblan-dev-sshd:
+    image: gblan-dev-sshd:1.0
+    container_name: gblan-dev-sshd
+    hostname: gblan-dev-sshd
+    tty: true
+    volumes:
+      - sshd-etc-ssh-data:/etc/ssh
+      - sshd-home-data:/home
+      - share-data:/share
+    dns: "192.168.51.100"
+    ports:
+      - "2022:22"
+    networks:
+      gblan-dev-net:
+        ipv4_address: "192.168.51.22"
+
+volumes:
+  sshd-etc-ssh-data:
+    name: gblan-dev-sshd-etc-ssh-data
+  sshd-home-data:
+    name: gblan-dev-sshd-home-data
+  share-data:
+    name: gblan-dev-share-data
+    external: true
+
+networks:
+  gblan-dev-net:
+    name: gblan-dev-net
+    external: true

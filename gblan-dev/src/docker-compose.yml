@@ -1,0 +1,145 @@
+name: gblan-dev
+services:
+  gblan-dev-nginx:
+    container_name: gblan-dev-nginx
+    hostname: gblan-dev-nginx
+    image: nginx:1.23.3-alpine
+    tty: true
+    volumes:
+      - nginx-keys-data:/etc/nginx/keys
+      - nginx-html-data:/usr/share/nginx/html
+      - nginx-templates-data:/etc/nginx/templates
+      - share-data:/share
+    dns: 192.168.51.100
+    ports:
+      - '443:443'
+    networks:
+      gblan-dev-net:
+        ipv4_address: 192.168.51.80
+    depends_on:
+      - gblan-dev-gitbucket
+      - gblan-dev-adminer
+    environment:
+      - NGINX_PORT=443
+  gblan-dev-dns:
+    image: gblan-dev-dns:1.0
+    container_name: gblan-dev-dns
+    hostname: gblan-dev-dns
+    command: '-conf /Corefile'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - 192.168.51.1:53:53/udp
+    networks:
+      gblan-dev-net:
+        ipv4_address: 192.168.51.100
+  gblan-dev-gitbucket:
+    image: gitbucket/gitbucket:4.38.4
+    container_name: gblan-dev-gitbucket
+    hostname: gblan-dev-gitbucket
+    tty: true
+    volumes:
+      - gitbucket-data:/gitbucket
+      - share-data:/share
+    dns: 192.168.51.100
+    ports:
+      - '2222:29418'
+    networks:
+      gblan-dev-net:
+        ipv4_address: 192.168.51.11
+    depends_on:
+      - gblan-dev-postgres
+    environment:
+      GITBUCKET_PREFIX: ${GITBUCKET_PREFIX:-/gitbucket}
+      GITBUCKET_DB_URL: ${GITBUCKET_DB_URL:-jdbc:postgresql://gblan-dev-postgres/gitbucket}
+      GITBUCKET_DB_USER: ${POSTGRES_USER:-gitbucket001}
+      GITBUCKET_DB_PASSWORD: ${POSTGRES_PASSWORD:-jPZIrD1VX6HJk}
+  gblan-dev-postgres:
+    image: postgres:14.5
+    container_name: gblan-dev-postgres
+    hostname: gblan-dev-postgres
+    tty: true
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      gblan-dev-net:
+        ipv4_address: 192.168.51.12
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gitbucket}
+      POSTGRES_USER: ${POSTGRES_USER:-gitbucket001}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jPZIrD1VX6HJk}
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS:- --encoding=UTF-8 --no-locale}
+  gblan-dev-adminer:
+    image: adminer:4.8.1-fastcgi
+    container_name: gblan-dev-adminer
+    hostname: gblan-dev-adminer
+    tty: true
+    dns: 192.168.51.100
+    networks:
+      gblan-dev-net:
+        ipv4_address: 192.168.51.13
+    environment:
+      ADMINER_DEFAULT_SERVER: ${ADMINER_DEFAULT_SERVER:-gblan-dev-postgres}
+  gblan-dev-sshd:
+    image: gblan-dev-sshd:1.0
+    container_name: gblan-dev-sshd
+    hostname: gblan-dev-sshd
+    tty: true
+    volumes:
+      - sshd-etc-ssh-data:/etc/ssh
+      - sshd-home-data:/home
+      - share-data:/share
+      - nginx-html-data:/nginx-html-data
+    dns: 192.168.51.100
+    ports:
+      - '2022:22'
+    networks:
+      gblan-dev-net:
+        ipv4_address: 192.168.51.22
+  gblan-dev-share:
+    image: ubuntu:22.04
+    container_name: gblan-dev-share
+    hostname: gblan-dev-share
+    tty: true
+    command: sleep infinity
+    working_dir: /share
+    volumes:
+      - share-data:/share
+    network_mode: none
+  gblan-dev-mkcert:
+    image: gblan-dev-mkcert:1.0
+    container_name: gblan-dev-mkcert
+    hostname: gblan-dev-mkcert
+    tty: true
+    command: sleep infinity
+    working_dir: /root
+    volumes:
+      - mkcert-root-data:/root
+      - mkcert-keys-data:/mkcert-keys
+      - share-data:/share
+    network_mode: none
+networks:
+  gblan-dev-net:
+    name: gblan-dev-net
+    external: true
+volumes:
+  share-data:
+    name: gblan-dev-share-data
+  postgres-data:
+    name: gblan-dev-postgres-data
+  gitbucket-data:
+    name: gblan-dev-gitbucket-data
+  sshd-etc-ssh-data:
+    name: gblan-dev-sshd-etc-ssh-data
+  sshd-home-data:
+    name: gblan-dev-sshd-home-data
+  nginx-keys-data:
+    name: gblan-dev-nginx-keys-data
+  nginx-html-data:
+    name: gblan-dev-nginx-html-data
+  nginx-templates-data:
+    name: gblan-dev-nginx-templates-data
+  mkcert-root-data:
+    name: gblan-dev-mkcert-root
+  mkcert-keys-data:
+    name: gblan-dev-mkcert-keys-data

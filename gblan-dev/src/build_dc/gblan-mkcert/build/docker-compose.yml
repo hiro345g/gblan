@@ -1,0 +1,19 @@
+name: gblan-dev
+services:
+  gblan-dev-mkcert-build:
+    build: .
+    image: gblan-dev-mkcert:1.0
+    container_name: gblan-dev-mkcert-build
+    hostname: gblan-dev-mkcert-build
+    tty: true
+    working_dir: /root
+    volumes:
+      - mkcert-root-data:/root
+      - mkcert-keys-data:/mkcert-keys
+    network_mode: "none"
+
+volumes:
+  mkcert-root-data:
+    name: gblan-dev-mkcert-root-data
+  mkcert-keys-data:
+    name: gblan-dev-mkcert-keys-data

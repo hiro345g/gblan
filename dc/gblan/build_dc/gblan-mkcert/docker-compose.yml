@@ -1,0 +1,22 @@
+name: gblan-mkcert
+services:
+  gblan-mkcert:
+    image: gblan-mkcert:1.0
+    container_name: gblan-mkcert
+    hostname: gblan-mkcert
+    tty: true
+    command: sleep infinity
+    working_dir: /root
+    volumes:
+      - mkcert-root-data:/root
+      - mkcert-keys-data:/mkcert-keys
+      - share-data:/share
+    network_mode: "none"
+
+volumes:
+  mkcert-root-data:
+    name: gblan-mkcert-root
+  mkcert-keys-data:
+    name: gblan-mkcert-keys-data
+  share-data:
+    name: gblan-share-data

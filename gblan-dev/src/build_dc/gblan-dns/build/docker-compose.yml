@@ -1,0 +1,9 @@
+name: gblan-dev
+services:
+  gblan-dev-dns-build:
+    build: .
+    image: gblan-dev-dns:1.0
+    container_name: gblan-dev-dns-build
+    hostname: gblan-dev-dns-build
+    tty: true
+    network_mode: "none"

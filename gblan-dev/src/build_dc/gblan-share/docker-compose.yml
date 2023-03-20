@@ -1,0 +1,16 @@
+name: gblan-dev
+services:
+  gblan-dev-share:
+    image: ubuntu:22.04
+    container_name: gblan-dev-share
+    hostname: gblan-dev-share
+    tty: true
+    command: sleep infinity
+    working_dir: /share
+    volumes:
+      - share-data:/share
+    network_mode: "none"
+
+volumes:
+  share-data:
+    name: gblan-dev-share-data

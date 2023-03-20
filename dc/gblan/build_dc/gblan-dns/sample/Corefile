@@ -1,0 +1,26 @@
+. {
+  errors
+  loop
+  reload
+
+  # /etc/hosts を使う場合の指定
+  hosts {
+      # 動作確認時は reload を短く指定すると反映が速くなる
+      #reload 1s
+      fallthrough
+  }
+
+  # 名前解決できなかったものは別のネームサーバーへフォワードする場合は下記を有効
+  # forward . 1.1.1.1 8.8.8.8
+  # ここでは /etc/resolv.conf の指定に従う
+  forward . /etc/resolv.conf
+  cache 30  
+}
+
+# gblan.example.jp ドメインのホスト用
+gblan.example.jp {
+  hosts /gblan_example_jp_hosts {
+    #reload 1s
+    fallthrough
+  }
+}

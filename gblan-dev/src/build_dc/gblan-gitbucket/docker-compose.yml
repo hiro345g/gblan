@@ -1,0 +1,88 @@
+# gblan-nginx の docker-compose.yml が正しければ、こちらはポート番号はずれていても良い
+name: gblan-dev
+services:
+  gblan-dev-dns:
+    image: gblan-dev-dns:1.0
+    container_name: gblan-dev-dns
+    hostname: gblan-dev-dns
+    command: -conf /Corefile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      gblan-dev-net:
+        ipv4_address: "192.168.51.100"
+    ports:
+      - "192.168.51.1:53:53/udp"
+
+  # http://localhost:8080/gitbucket/
+  gblan-dev-gitbucket:
+    image: gitbucket/gitbucket:4.38.4
+    container_name: gblan-dev-gitbucket
+    hostname: gblan-dev-gitbucket
+    tty: true
+    volumes:
+      - gitbucket-data:/gitbucket
+      - share-data:/share
+    dns: "192.168.51.100"
+    ports:
+      - 18080:8080
+      - 12222:29418
+    networks:
+      gblan-dev-net:
+        ipv4_address: "192.168.51.11"
+    depends_on:
+      - gblan-dev-postgres
+    environment:
+      GITBUCKET_PREFIX: ${GITBUCKET_PREFIX:-/gitbucket}
+      GITBUCKET_DB_URL: ${GITBUCKET_DB_URL:-jdbc:postgresql://gblan-dev-postgres/gitbucket}
+      GITBUCKET_DB_USER: ${POSTGRES_USER:-gitbucket001}
+      GITBUCKET_DB_PASSWORD: ${POSTGRES_PASSWORD:-jPZIrD1VX6HJk}
+
+  gblan-dev-postgres:
+    image: postgres:14.5
+    container_name: gblan-dev-postgres
+    hostname: gblan-dev-postgres
+    tty: true
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      gblan-dev-net:
+        ipv4_address: "192.168.51.12"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gitbucket}
+      POSTGRES_USER: ${POSTGRES_USER:-gitbucket001}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jPZIrD1VX6HJk}
+      POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS:- --encoding=UTF-8 --no-locale}
+
+  # http://localhost:9080/
+  gblan-dev-adminer:
+    image: adminer:4.8.1-standalone
+    #image: adminer:4.8.1-fastcgi
+    container_name: gblan-dev-adminer
+    hostname: gblan-dev-adminer
+    tty: true
+    dns: "192.168.51.100"
+    ports:
+      # standalone
+      - 19080:8080
+      # fastcgi
+      #- 9000:9000
+    networks:
+      gblan-dev-net:
+        ipv4_address: "192.168.51.13"
+    environment:
+      ADMINER_DEFAULT_SERVER: ${ADMINER_DEFAULT_SERVER:-gblan-dev-postgres}
+
+volumes:
+  postgres-data:
+    name: gblan-dev-postgres-data
+  gitbucket-data:
+    name: gblan-dev-gitbucket-data
+  share-data:
+    name: gblan-dev-share-data
+    external: true
+
+networks:
+  gblan-dev-net:
+    name: gblan-dev-net
+    external: true

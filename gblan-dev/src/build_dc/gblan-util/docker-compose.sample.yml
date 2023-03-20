@@ -1,0 +1,24 @@
+name: gblan-dev
+services:
+  gblan-dev-util:
+    image: ubuntu:22.04
+    container_name: gblan-dev-util
+    hostname: gblan-dev-util
+    tty: true
+    command: sleep infinity
+    working_dir: /share
+    volumes:
+      - share-data:/share
+      - sshd-etc-ssh-data:/sshd-etc-ssh-data
+      - sshd-home-data:/sshd-home-data
+
+volumes:
+  share-data:
+    name: gblan-dev-share-data
+    external: true
+  sshd-etc-ssh-data:
+    name: gblan-dev-sshd-etc-ssh-data
+    external: true
+  sshd-home-data:
+    name: gblan-dev-sshd-home-data
+    external: true
