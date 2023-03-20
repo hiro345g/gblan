@@ -153,7 +153,7 @@ gblan.example.jp は LAN 内で利用している分には、あまり問題に�
 
 ビルドには `sh` のシェルスクリプト、`docker` コマンド、`docker compose` コマンドが実行できる環境が必要です。環境としては、次のようなものが考えられます。
 
-- a）gblan-dev-container を使って構築した環境（devnode-desktop コンテナーの利用）
+- a）[hiro345g/gblan\-dev\-docker](https://github.com/hiro345g/gblan-dev-docker) を使って構築した環境（[hiro345g/devnode\-desktop](https://github.com/hiro345g/devnode-desktop) の利用）
 - b）Linux へ Docker CE または Docker Desktop をインストールした環境
 
 いずれかの環境があれば、`${GBLAN_DIR}/build_dc/README.md` にある手順に従ったコマンドの実行ができます。そうすれば、必要な Docker イメージ、Docker ボリューム、Docker ネットワークが用意できます。
