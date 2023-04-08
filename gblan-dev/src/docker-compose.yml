@@ -28,8 +28,8 @@ services:
     command: '-conf /Corefile'
     extra_hosts:
       - host.docker.internal:host-gateway
-    ports:
-      - 192.168.51.1:53:53/udp
+    #ports:
+    #  - 192.168.51.1:53:53/udp
     networks:
       gblan-dev-net:
         ipv4_address: 192.168.51.100

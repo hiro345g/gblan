@@ -31,8 +31,8 @@ services:
     networks:
       gblan-net:
         ipv4_address: 192.168.50.100
-    ports:
-      - 192.168.50.1:53:53/udp
+    #ports:
+    #  - 192.168.50.1:53:53/udp
   gblan-gitbucket:
     image: gitbucket/gitbucket:4.38.4
     container_name: gblan-gitbucket
